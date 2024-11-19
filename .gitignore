@@ -1,3 +1,19 @@
+data/*
+!data/yeast-ORBI/
+data/yeast-ORBI/*
+!data/yeast-ORBI/raw/
+!data/yeast-ORBI/raw/**
+!data/yeast-LCQ/
+data/yeast-LCQ/*
+!data/yeast-LCQ/raw/
+!data/yeast-LCQ/raw/**
+!data/gastric_all_data/
+data/gastric_all_data/*
+!data/gastric_all_data/raw/
+!data/gastric_all_data/raw/**
+#data/gastric_all_data/raw/embedding
+
+
 __pycache__/
 .pytest_cache/
 .DS_Store
@@ -32,13 +48,6 @@ benchmark/results/
 !torch_geometric/data/
 !test/data
 
-
-data/*
-
-!data/yeast-LCQ/raw
-!data/yeast-ORBI/raw
-!data/gastric_all_data/raw
-#data/gastric_all_data/raw/embedding
 
 configs/*_grid_*
 # any pdf files

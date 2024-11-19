@@ -1,1 +1,4 @@
 *.py text eol=lf
+data/yeast-ORBI/raw/** filter=lfs diff=lfs merge=lfs -text
+data/yeast-LCQ/raw/** filter=lfs diff=lfs merge=lfs -text
+data/gastric_all_data/raw/** filter=lfs diff=lfs merge=lfs -text
