@@ -1,0 +1,1 @@
+from .custom_graphgym.loader.protein import ProteinDataset

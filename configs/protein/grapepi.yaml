@@ -1,0 +1,116 @@
+# The recommended basic settings for GNN
+# Select device: 'cpu', 'cuda', 'auto'
+accelerator: 'auto'
+  # number of devices: eg. for 2 GPU set cfg.devices=2
+devices: 1
+# the number of workers for data loader. Adjust according to your machine.
+num_workers: 8
+# the output directory for the results. Default is "results" folder in your root directory.
+out_dir: results
+# the metric used for select the best model. Default is "auc". Other options: accuracy, precision, recall, f1
+metric_best: auc
+# the random seed for reproducibility. It is used across the project, including data split, model initialization, etc.
+seed: 1234
+dataset:
+  name: protein # dataset type. It should be keep unchanged
+  # the directory of the dataset.
+  dir: data/gastric_all_data
+  # whether to rebuild the dataset. If true, the dataset will be reprocessed based on provided configuration in dataset section.
+  # If false, the dataset will be loaded from the processed folder. Set to true if you keep changing your dataset configuration in the testing process
+  # and then change it to false during hyperparameter tuning to avoid rebuilding the same data.
+  rebuild: true
+  # the column name of the label in the dataset
+  label_col: hard_label
+    # the column names of the node features in the dataset, you should only provide the numeric columns here.
+  node_numeric_cols: [protein_probability] # , mRNA_TPM
+  # the column name of the edge weight in the dataset. Set to "null" if no edge weight is used.
+  # Be careful! Not all layer_type support edge weight. Currently, for use edge weight, you should use "gcnconv_with_edgeweight" as gnn.layer_type.
+  # sageconv doesn't support edge weight.
+  interaction_weight_col : null
+  # the column to use for filter interaction. Set to "null" if use all interactions.
+  interaction_conf_col: null
+  # the threshold for interaction confidence. Only interactions with confidence higher than this threshold will be used. It only works when interaction_conf_col is not null.
+  # be careful the scale of this parameter may differ from dataset to dataset (in STRINGR range between 150-1000).
+  # Please use float number even for integer values, such as 700.0 instead of 700.
+  interaction_conf_thresh: 0.0
+  task: node # Type of task. For Grape-Pi it is a node classification task. It should be keep unchanged
+  task_type: classification # Type of task. It should be keep unchanged
+  # when you have non-numeric node feature you need to encode them. Only for advanced user.
+  node_encoder: false
+  # when you have non-numeric edge you need to encode them. Only for advanced user.
+  edge_encoder: false
+    # the split ratio of the dataset train, validation, and test respectively. The sum of the split ratio should be 1.0
+  split: [0.6, 0.2, 0.2]
+share:
+  # the input dimension of the model. -1 means the input dimension is the same as the number of node features. It should be kept it as -1
+  dim_in: -1
+  # the output dimension of the model. 2 is for binary classification. It should be kept it as 2 for we use Grapei-Pi for a binary classification task.
+  dim_out: 2
+# train section is the main sections where hyperparameters tuning happens
+train:
+  # the number of samples in a batch. If you use sageconv as gnn.layer_type, it means the number of nodes in a batch, you can use 64, 128, 256, ...
+  # when you use gcnconv as gnn.layer_type, it should be set to 1 as it is a full batch training (each time the entire graph as input).
+  batch_size: 128
+  # the period of saving the model checkpoint. It should be set to 10.
+  ckpt_period: 10
+  # whether to clean the checkpoint folder. If true, only the last checkpoint will be saved. If false, all checkpoints will be saved.
+  ckpt_clean: false
+  # the sampler used for sampling the neighbor. It should be set to neighbor when you use sageconv as gnn.layer_type. and full_batch when you use gcnconv as gnn.layer_type.
+  sampler: neighbor
+  # Evaluated model performance for every eval_period epochs.
+  eval_period: 10
+  # the neighbor sizes for sampling the neighbor for each hop from the target node. It is used when you use sageconv as gnn.layer_type.
+  neighbor_sizes: [20, 10, 5]
+  # the epoch to resume the training. It should be set to 0 when you start the training from scratch.
+  epoch_resume: 0
+  # whether to use early stopping. If true, the training will stop when the performance on the validation set does not improve for early_stop_patience epochs.
+  early_stop: false
+  # the patience for early stopping (numer of epochs without improving). It is only used when early_stop is true.
+  early_stop_patience: 50
+model:
+  type: gnn
+  loss_fun: cross_entropy
+  # the weight is calculated by num_negative_sample/num_positive_sample
+gnn:
+  # the number of pre-message passing layers. It should be set to 1. pre-message passing layers are just MLP
+  layers_pre_mp: 1
+  # the number of message passing layers. The number of mp layer how far (hops) a neighbor node can be reached from the target node.
+  layers_mp: 1
+  # similar to pre-message passing layers, post-message passing layers are just MLP.
+  layers_post_mp: 1
+  # the inner dimension of the model. it is same across all inner layers.
+  dim_inner: 10
+  # the type of the layer. It should be set to sageconv when you use sageconv as gnn.layer_type and gcnconv when you use gcnconv as gnn.layer_type.
+  layer_type: sageconv # sageconv gcnconv
+  # the type of the stage. It should be set to skipsum when you use sageconv as gnn.layer_type. Other options are stack, skipsum, skipconcat.
+  # stack: no skip connection, skipsum: skip connection with sum, skipconcat: skip connection with concatenation.
+  stage_type: skipsum
+  # whether to use batch normalization. It should be set to false.
+  batchnorm: false
+  # the activation function. Currently only relu is supported.
+  act: relu
+  # the dropout rate. It should between 0.0 and 1.0.
+  dropout: 0.0
+  # whether to normalize the adjacency matrix.
+  normalize_adj: false
+  # the head of the model. It should be set to protein.
+  head: protein
+optim:
+  # the optimizer used for training. Options: adam, sgd
+  optimizer: adam
+  # base learning rate.
+  base_lr: 0.001
+  # weight decay. see https://pytorch.org/docs/stable/generated/torch.optim.Adam.html for more information.
+  weight_decay: 5e-4
+  # the maximum number of epochs for training.
+  max_epoch: 300
+  # try not use schedule and check fluctuation of training curve. Options: none, step, cos
+  scheduler: none
+run:
+  # the number of times to repeat the training. When is larger than one. The training will be repeated multiple times with different random seeds (+1 each time).
+  repeat: 1
+  # the name to save the out_dir. When is none, it will be saved in a subfold in out_dir folder using the configuration file name.
+  # useful when you use the same config  template while overriding some parameters and want to save it under a different name.
+  name: none
+  # whether to mark the configuration file as with suffix "_done" after the training is done. It is useful when you have a large number of configurations to run.
+  mark_done: false

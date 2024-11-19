@@ -1,0 +1,60 @@
+# The recommended basic settings for Grape-Pi
+accelerator: 'auto'
+devices: 1
+num_workers: 8
+out_dir: results
+metric_best: auc
+seed: 1234
+dataset:
+  name: protein
+  dir: data/gastric_all_data
+  rebuild: true
+  label_col: hard_label_03_07
+  node_numeric_cols:
+  - protein_probability
+#  - mRNA_TPM
+  interaction_weight_col: null
+  interaction_conf_col: null
+  interaction_conf_thresh: 400.0
+  edge_numeric_cols: none
+  task: node
+  task_type: classification
+  node_encoder: false
+  edge_encoder: false
+  split: [0.6, 0.2, 0.2] # train, val, test
+share:
+  dim_in: -1
+  dim_out: 2  # dim_out 2 is for binary classification
+train:
+  batch_size: 1
+  ckpt_period: 10
+  ckpt_clean: false
+  sampler: full_batch
+  epoch_resume: 0
+  early_stop: True
+  early_stop_patience: 50
+model:
+  type: gnn
+  loss_fun: binary_cross_entropy_with_weight # or mse
+gnn:
+  layers_pre_mp: 1
+  layers_mp: 1
+  layers_post_mp: 1
+  dim_inner: 10
+  layer_type: gcnconv # sageconv gcnconv
+  stage_type: skipsum  # stack skipsum skipconcat
+  batchnorm: false
+  act: relu
+  dropout: 0.3
+  normalize_adj: false
+  head: protein
+optim:
+  optimizer: adam
+  base_lr: 0.001
+  weight_decay: 5e-4
+  max_epoch: 300
+  scheduler: none
+run:
+  repeat: 1
+  name: none
+  mark_done: false
