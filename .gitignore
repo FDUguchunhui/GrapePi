@@ -55,3 +55,4 @@ configs/*_grid_*
 library/*
 saved_results/*
 results/*
+*.tiff

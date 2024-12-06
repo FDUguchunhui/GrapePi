@@ -18,7 +18,6 @@ dataset: # need to delete file in processed folder if change args under dataset 
   task_type: classification
   transductive: false
   transform: none
-  encoder: false
   node_encoder: false
   edge_encoder: false
   split: [0.6, 0.2, 0.2] # train, val, test

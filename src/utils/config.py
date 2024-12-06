@@ -235,6 +235,10 @@ def dump_cfg(cfg):
     Args:
         cfg: Configuration node
     """
+
+    # todo: this is a temporary fix without changing code in torch_geometric/graphgym
+    # the saved config file cannot be used to rerun the experiment since some of the config is changed
+    # during execution and saved
     if cfg.run.name is not None:
         output_dir = os.path.join(cfg.out_dir, cfg.run.name)
     else:
@@ -244,8 +248,11 @@ def dump_cfg(cfg):
     cfg_file = osp.join(output_dir, cfg.cfg_dest)
     # remove the last part of the path of cfg.out_dir
     # this is bug in original graphgym since its change cfg make the saved config file cannot be used to rerun the experiment
+    cfg_for_dump = cfg
+    # remove cfg.output_dir from cfg_for_dump
+    cfg_for_dump.output_dir = None
     with open(cfg_file, 'w') as f:
-        cfg.dump(stream=f)
+        cfg_for_dump.dump(stream=f)
 
 
 

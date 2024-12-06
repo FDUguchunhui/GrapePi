@@ -18,7 +18,7 @@ def set_cfg(cfg):
     cfg.dataset.rebuild = False
     cfg.dataset.interaction_weight_col = None
     cfg.dataset.interaction_conf_col = None
-    cfg.dataset.interaction_conf_thresh = 700.0
+    cfg.dataset.interaction_conf_thresh = 400.0
     cfg.train.pos_weight = -1.0
     cfg.train.early_stop = False
     cfg.train.early_stop_patience = 50
