@@ -31,6 +31,7 @@ def load_dataset_protein(format: object, name: object, dataset_dir: object) -> o
                                          interaction_weight_col=cfg.dataset.interaction_weight_col,
                                          interaction_conf_col=cfg.dataset.interaction_conf_col,
                                          interaction_conf_thresh=cfg.dataset.interaction_conf_thresh,
+                                         include_seq_embedding=cfg.dataset.include_seq_embedding,
                                          num_val=cfg.dataset.split[1], num_test=cfg.dataset.split[2])
             # calculate pos_weight
             if cfg.train.pos_weight == -1:

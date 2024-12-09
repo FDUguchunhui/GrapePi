@@ -62,6 +62,7 @@ class GCNConvGymModule(GraphGymModule):
         dataset = ProteinDataset(root=cfg.dataset.dir, rebuild=True,
                                  node_numeric_cols=cfg.dataset.node_numeric_cols,
                                  label_col=cfg.dataset.label_col,
+                                 include_seq_embedding=cfg.dataset.include_seq_embedding,
                                  num_val=0, num_test=0)
 
         return dataset

@@ -1,5 +1,6 @@
 import os
 import shlex
+from copy import deepcopy
 
 from omegaconf import DictConfig as CN, OmegaConf
 from omegaconf import OmegaConf as OC
@@ -27,6 +28,8 @@ def add_cfg_if_not_exists(cfg):
     # ----------------------------------------------------------------------- #
     # Basic options
     # ----------------------------------------------------------------------- #
+
+    cfg.out_dir = 'results'
 
     # Set print destination: stdout / file / both
     cfg.setdefault('print', 'both')
@@ -248,9 +251,9 @@ def dump_cfg(cfg):
     cfg_file = osp.join(output_dir, cfg.cfg_dest)
     # remove the last part of the path of cfg.out_dir
     # this is bug in original graphgym since its change cfg make the saved config file cannot be used to rerun the experiment
-    cfg_for_dump = cfg
+    cfg_for_dump = deepcopy(cfg)
     # remove cfg.output_dir from cfg_for_dump
-    cfg_for_dump.output_dir = None
+    cfg_for_dump.pop('output_dir')
     with open(cfg_file, 'w') as f:
         cfg_for_dump.dump(stream=f)
 
