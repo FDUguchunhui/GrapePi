@@ -66,7 +66,7 @@ train:
   # whether to use early stopping. If true, the training will stop when the performance on the validation set does not improve for early_stop_patience epochs.
   early_stop: false
   # the patience for early stopping (numer of epochs without improving). It is only used when early_stop is true.
-  early_stop_patience: 50
+  early_stop_patience: 10
 model:
   type: gnn
   loss_fun: cross_entropy

@@ -37,7 +37,7 @@ train:
     - 5
   epoch_resume: 0
   early_stop: True
-  early_stop_patience: 50
+  early_stop_patience: 10
 model:
   type: gnn
   loss_fun: binary_cross_entropy_with_weight

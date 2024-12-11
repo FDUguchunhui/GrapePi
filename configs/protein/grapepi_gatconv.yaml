@@ -32,8 +32,8 @@ train:
   sampler: full_batch
   epoch_resume: 0
   early_stop: True
-  early_stop_patience: 50
-model:
+  early_stop_patience: 10
+  model:
   type: gnn
   loss_fun: binary_cross_entropy_with_weight # or mse
 gnn:

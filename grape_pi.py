@@ -78,15 +78,9 @@ def main():
         raise ValueError(f'Unsupported layer type {cfg.gnn.layer_type}. current support sageconv, gcnconv, gatconv, gcnconv_with_edgeweight')
 
 
-# Print model info
+    # Print model info
     logging.info(model)
     logging.info(cfg)
-
-    # get the dictionary mapping from global node index to original protein accession
-    # get the file in subdirectory "raw" of args.data and has "mapping" in the name
-    # Use glob to get all files in the directory that have "mapping" in the name
-    mapping = pd.read_csv(glob.glob(os.path.join(cfg.dataset.dir, '*mapping*'))[0])
-    mapping = dict(zip(mapping['integer_id'], mapping['protein_id']))
 
     if args.checkpoint is not None:
         print(f'Loading checkpoint from {args.checkpoint}')
@@ -124,10 +118,18 @@ def main():
         devices='auto' if not torch.cuda.is_available() else cfg.devices,
     )
 
+
     #  torch lightning put a return value in a list [] with just one element
     prediction = trainer.predict(model)
     all_pred_prob = prediction[0]['pred_prob']
     index = prediction[0]['index']
+
+    # get the dictionary mapping from global node index to original protein accession
+    # get the file in subdirectory "raw" of args.data and has "mapping" in the name
+    # Use glob to get all files in the directory that have "mapping" in the name
+    mapping = pd.read_csv(glob.glob(os.path.join(cfg.dataset.dir, '*mapping*'))[0])
+    mapping = dict(zip(mapping['integer_id'], mapping['protein_id']))
+
     # convert the node index to original protein ID
     accession = [mapping[key] for key in index]
 
