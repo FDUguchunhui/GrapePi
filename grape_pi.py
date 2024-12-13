@@ -37,6 +37,9 @@ def main():
                         help='The checkpoint file path.')
     parser.add_argument('--threshold', dest='threshold', type=float, default=0.9,
                         help='The threshold to determine the unconfident proteins based on raw protein probability.')
+    parser.add_argument('--labeled', dest='labeled', action='store_true',
+                        help='Whether to apply promotion to labeled data as well. '
+                             'if not provided, the promotion will only apply to the unlabeled proteins only')
     parser.add_argument('--num-promoted', dest='num_promoted', type=int, default=100,
                         help='The number, N, of proteins to be promoted '
                              'Top N Proteins will be selected based on the prediction probability from unconfident'
@@ -158,9 +161,10 @@ def main():
     all_proteins_df = all_proteins_df.loc[:, [protein_id_col, 'pred_prob', cfg.dataset.label_col]]
     all_proteins_df.columns = ['accession', 'pred_prob','label']
     # slice unlabeled protein if cfg.dataset.label_column is NaN
-    unlabeled_protein_df = all_proteins_df[pd.isnull(all_proteins_df['label'])]
+    if not args.labeled:
+        all_proteins_df = all_proteins_df[pd.isnull(all_proteins_df['label'])]
 
-    unconfident_protein = unlabeled_protein_df[(unlabeled_protein_df.iloc[:, 1] < args.threshold)]
+    unconfident_protein = all_proteins_df[(all_proteins_df.iloc[:, 1] < args.threshold)]
 
     # get the top N proteins to be promoted
     output_dir = os.path.join(args.output or cfg.dataset.dir, 'promoted_proteins.csv')
